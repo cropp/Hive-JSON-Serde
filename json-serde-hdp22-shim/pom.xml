@@ -7,9 +7,9 @@
         <relativePath>../pom.xml</relativePath>
         <version>1.3.2-SNAPSHOT</version>
     </parent>
-    <artifactId>json-serde-cdh5-shim</artifactId>
+    <artifactId>json-serde-hdp22-shim</artifactId>
     <packaging>jar</packaging>
-    <name>json-cdh5-shim</name>
+    <name>json-hdp22-shim</name>
 
     <build>
         <plugins>
@@ -27,7 +27,6 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.hive</groupId>

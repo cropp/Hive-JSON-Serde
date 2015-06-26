@@ -7,6 +7,14 @@ Serialization/Deserialization module for Apache Hadoop Hive
 
 This module allows hive to read and write in JSON format (see http://json.org for more info).
 
+Updates and reason for this fork
+================================================
+* I have not mastered the art of working with thh open community (a self help doc would be great)
+* This release seemed very focued on Cloudera but I am using hdp
+* I added one feature for dealing with ISO9601 time in my JSON, it only works one direction and I would like to update for other formats
+* You can now change the java.version by setting -Djava.version=1.7 HDP22 defaults to 1.7 all else to 1.6
+* Note that some of the build args changed from Roberto's fork
+
 Features:
 * Read data stored in JSON format
 * Convert data to JSON format when INSERT INTO table
@@ -43,6 +51,10 @@ To build for CDH5:
 mvn -Pcdh5 clean package
 ```
 
+To build for HDP22:
+```
+mvn -Phdp22 clean package
+
 the serde will be in 
 ```
 json-serde/target/json-serde-VERSION-jar-with-dependencies.jar
@@ -53,10 +65,9 @@ json-serde/target/json-serde-VERSION-jar-with-dependencies.jar
 $ mvn package
 
 # If you want to compile the serde against a different
-# version of the cloudera libs, use -D:
+# version of the cloudera/hdp libs, use -D:
 $ mvn -Dcdh.version=0.9.0-cdh3u4c-SNAPSHOT package
 ```
-
 
 
 Hive 0.14.0 and 1.0.0
@@ -64,9 +75,14 @@ Hive 0.14.0 and 1.0.0
 
 Compile with
 ```
-mvn -Pcdh5 -Dcdh5.hive.version=1.0.0 clean package
+mvn -Pcdh5 -Dhive.version=1.0.0 clean package
 ```
 
+
+INSTALLATION
+------------
+Installation depends on platform as well as if you have hue with beeswax 
+For horton works I placed jar in /usr/hdp/current/hive-webhcat/share/hcatalog
 
 EXAMPLES
 ------------

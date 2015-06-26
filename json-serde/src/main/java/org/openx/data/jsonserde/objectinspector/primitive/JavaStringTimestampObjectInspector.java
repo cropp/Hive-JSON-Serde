@@ -12,26 +12,32 @@
 
 package org.openx.data.jsonserde.objectinspector.primitive;
 
-import java.sql.Timestamp;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.AbstractPrimitiveJavaObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableTimestampObjectInspector;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+
+import java.sql.Timestamp;
 
 /**
  * A timestamp that is stored in a String
+ *
  * @author rcongiu
  */
 public class JavaStringTimestampObjectInspector extends AbstractPrimitiveJavaObjectInspector
-    implements SettableTimestampObjectInspector {
-    
+        implements SettableTimestampObjectInspector {
+
     public JavaStringTimestampObjectInspector() {
         super(TypeEntryShim.timestampType);
     }
 
-    
+
     @Override
     public Object set(Object o, byte[] bytes, int offset) {
-        return create(bytes,offset);
+        return create(bytes, offset);
     }
 
     @Override
@@ -46,7 +52,7 @@ public class JavaStringTimestampObjectInspector extends AbstractPrimitiveJavaObj
 
     @Override
     public Object create(byte[] bytes, int offset) {
-       return new TimestampWritable(bytes, offset).toString();
+        return new TimestampWritable(bytes, offset).toString();
     }
 
     @Override
@@ -54,25 +60,43 @@ public class JavaStringTimestampObjectInspector extends AbstractPrimitiveJavaObj
         return tmstmp.toString();
     }
 
+    static final DateTimeFormatter ISO_FORMAT = ISODateTimeFormat.dateTime();
+    static final DateTimeFormatter HDP_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSSS");
+
     @Override
     public TimestampWritable getPrimitiveWritableObject(Object o) {
-        if(o == null) return null;
-        
-        if(o instanceof String) {
-           return new TimestampWritable(ParsePrimitiveUtils.parseTimestamp((String)o)); 
+        if (o == null) return null;
+        if (o instanceof Timestamp) {
+            if (((String) o).contains("T")) {
+                return new TimestampWritable(ParsePrimitiveUtils.parseTimestamp(
+                        ISO_FORMAT.parseDateTime((String) o).withZone(DateTimeZone.UTC).toString(HDP_FORMAT)));
+            } else {
+                return new TimestampWritable(ParsePrimitiveUtils.parseTimestamp((String) o));
+            }
         } else {
-          return new TimestampWritable(((Timestamp) o));
+            return new TimestampWritable(((Timestamp) o));
         }
     }
 
+    /**
+     * Later implement a property for defining date transform syntax
+     *
+     * @param o
+     * @return
+     */
     @Override
     public Timestamp getPrimitiveJavaObject(Object o) {
-         if(o instanceof String) {
-           return ParsePrimitiveUtils.parseTimestamp((String)o); 
+        if (o instanceof String) {
+            if (((String) o).contains("T")) {
+                return ParsePrimitiveUtils.parseTimestamp(
+                        ISO_FORMAT.parseDateTime((String) o).withZone(DateTimeZone.UTC).toString(HDP_FORMAT));
+            } else {
+                return ParsePrimitiveUtils.parseTimestamp((String) o);
+            }
         } else {
-           return ((Timestamp) o);
+            return ((Timestamp) o);
         }
     }
 
-   
+
 }

@@ -91,7 +91,7 @@ public class JsonSerDeTimeStampTest {
      StructObjectInspector soi = (StructObjectInspector) instance.getObjectInspector();
     JavaStringTimestampObjectInspector jstOi = (JavaStringTimestampObjectInspector) 
             soi.getStructFieldRef("five").getFieldObjectInspector();
-    assertEquals(getDate("2013-05-05 17:58:45.0" ), 
+    assertEquals(getDate("2013-05-05 17:58:45.0" ),
             jstOi.getPrimitiveJavaObject(result.get("five"))   );
   }
 
@@ -107,7 +107,21 @@ public class JsonSerDeTimeStampTest {
     assertEquals(getDate("2013-05-05 17:58:45.123"), 
             jstOi.getPrimitiveJavaObject(result.get("five")) );
   }
-  
+
+    @Test
+    public void testTimestampDeSerializeIso9601() throws Exception {
+        // Test that timestamp object can be deserialized
+        Writable w = new Text("{\"one\":true,\"five\":\"2013-03-27T23:18:40.123Z\"}");
+
+        JSONObject result = (JSONObject) instance.deserialize(w);
+
+        StructObjectInspector soi = (StructObjectInspector) instance.getObjectInspector();
+
+        JavaStringTimestampObjectInspector jstOi = (JavaStringTimestampObjectInspector)
+                soi.getStructFieldRef("five").getFieldObjectInspector();
+        assertEquals( Timestamp.valueOf("2013-03-27 23:18:40.123"),  jstOi.getPrimitiveJavaObject(result.get("five")));
+    }
+
   /** 
    * for tests, if time zone not specified, make sure that it's in the correct
    * timezone
